@@ -1,0 +1,5 @@
+1 - Displaying records
+2 - Displaying records by ID
+3 - Adding records
+4 - Updating records
+5 - Delete Records

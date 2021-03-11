@@ -1,7 +1,7 @@
 <template>
     <div>
         <b-container style="width: 50%;">
-            <b-form @submit="onSubmit">
+            <b-form>
                 <b-form-group
                 id="userInput1"
                 label="First Name: "
@@ -14,6 +14,7 @@
                     required
                     >
                     </b-form-input>
+                    <p v-if="validInput" style="color:red;">Please only use Alphabetic Characters and no Space</p>
                 </b-form-group>
                 <b-form-group
                 id="userInput2"
@@ -27,6 +28,7 @@
                     required
                     >
                     </b-form-input>
+                    <p v-if="validInput" style="color:red;">Please only use Alphabetic Characters and no Space</p>
                 </b-form-group>
                 <b-form-group
                 id="userInput3"
@@ -102,18 +104,24 @@
 export default {
     data() {
         return {
-
+            firstName: '',
+            lastName: '',
+            age: '',
+            email: '',
+            username: '',
+            password: ''
         }
     },
    methods:
    {
-       /*textValidation(id) {
+       textValidation(id) {
            let inputField = document.getElementById(id);
-           let regex = 
-           if(inputField === '' || regex.test(inputField.value)) {
-
+           let validInput = null;
+           let regex = /^[a-zA-Z]+$/;
+           if(inputField.value === '' || !regex.test(inputField.value)) {
+               return true;
            }
-       }*/
+       }
    }
 }
 </script>

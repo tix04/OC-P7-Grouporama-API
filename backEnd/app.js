@@ -14,6 +14,18 @@ app.use((req, res, next) => {
   app.use(bodyParser.json());
   //app/use(bodyParser.urlencoded({ extended: false}));
   
-// mySQL codes later
+// mySQL codes
+const pool = mysql.createPool({ //what is this? Creates connection to database
+  connectionLimit : 10,  //Maximum connection allowed. See Documentation
+  host            : 'localhost',
+  user            : 'root',
+  password        : '',
+  database        : 'grouporama'
+}) 
+
+
+
+
+
 
   module.exports = app;

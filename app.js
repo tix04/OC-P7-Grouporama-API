@@ -175,6 +175,10 @@ app.put('/users/:user_id', (req, res) => { //Just change this with post_id for p
     }
     const params =  req.params.user_id;
     const {user_id, username, password, first_name, last_name, age, email} = req.body;
+
+    /**
+     * TODO: Replace the below query with minimal parameters query
+     */
     connection.query('UPDATE users SET username = ?, password = ?, first_name = ?, last_name = ?, age = ?, email = ? WHERE user_id = ?',[username, password, first_name, last_name, age, email,params], (err,rows) => { 
       
       connection.release();

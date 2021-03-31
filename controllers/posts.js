@@ -61,6 +61,46 @@ exports.getAllPosts = (req, res, next) => {
     });
 };
 
+exports.getPostsCount = (req, res, next) => {
+    mySqlConnection.getConnection((err, connection) => {
+        if(err) {
+            throw err;
+        }else {
+            console.log('Number of Posts Amount retrieved');
+        }
+
+        connection.query('SELECT COUNT(post_id) AS postsCount, viewed_posts FROM posts, poststatus', (err,count) => {
+            if(!err) {
+                
+                console.log(count);
+                res.send(count);
+            }else {
+                console.log(err);
+            }
+        });
+    });
+};
+
+exports.setNotification = (req, res, next) => {
+    mySqlConnection.getConnection((err, connection) => {
+        if(err) {
+            throw err;
+        }else { 
+            console.log('Posts viewed have been updated');
+        }
+
+        console.log(req.body.count);
+        connection.query('UPDATE poststatus SET viewed_posts = ? WHERE summary_id=1', [req.body.count],(err, count) => {
+            if(!err) {
+
+                res.send(`You have viewed all new posts`);
+            }else {
+                console.log(err);
+            }
+        });
+    });
+};
+
 /*TODO:
 *Create a GET method that only returns posts of connected user by user_id
 */

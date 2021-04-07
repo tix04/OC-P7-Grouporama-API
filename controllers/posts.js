@@ -48,7 +48,7 @@ exports.getAllPosts = (req, res, next) => {
         }else {
             console.log('All posts Retrieved');
         }
-
+        //TODO: Posts with no comments do not display
         //connection.query('SELECT * from posts ORDER BY time_created DESC', (err, rows) => {
         connection.query('SELECT posts.post_content, posts.attached_files, comments.comment_content FROM posts INNER JOIN comments ON posts.post_id=comments.post_id ORDER BY posts.time_created DESC', (err, rows) => {
             if(!err) {

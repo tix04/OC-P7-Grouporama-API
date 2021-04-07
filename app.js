@@ -1,7 +1,7 @@
 const express = require('express')
 const bodyParser = require('body-parser');
 const mySql = require('mysql');
-
+const path = require('path');
 const postRoutes = require('./routes/post');
 const userRoutes = require('./routes/user');
 
@@ -17,16 +17,9 @@ app.use((req, res, next) => {
   app.use(bodyParser.json());
   //app/use(bodyParser.urlencoded({ extended: false}));
   
-/* mySQL codes Set connection to mysql database: Code is here
-const pool = mySql.createPool({ 
-  connectionLimit : 10,  //Maximum connection allowed. See Documentation
-  host            : 'localhost', //Where database is hosted
-  user            : 'root',      //username
-  password        : '',          //password
-  database        : 'grouporama' //Which database to access
-}) */
 
 // This is where all codes go
+app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use('/posts', postRoutes);
 app.use('/user', userRoutes);
 

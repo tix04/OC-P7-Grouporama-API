@@ -1,29 +1,53 @@
 const mySqlConnection = require('../middleware/databaseConnection');
-
+const fs = require('fs');
 //POST Create User Account
 exports.createUser = (req, res, next) => {
-    mySqlConnection.getConnection((err, connection) => {
-        if(err) {
-            throw err;
-        }else {
-            console.log('New User has been added!');
-        }
+  //let url = req.protocol + '://' + req.get('host');
+  console.log(req.body);
+  let formData = JSON.parse(req.body.user);
+  console.log(formData);
+  let profileImage = req.body.image;
+  console.log(profileImage);
+  let url = req.protocol + '://' + req.get('host') + ':/images/' + profileImage;
+  console.log(url);
 
-        const params = req.body;
+ 
+  let newUser = {
+    first_name: formData.firstName,
+    last_name: formData.lastName,
+    age: formData.age,
+    email: formData.email,
+    username: formData.username,
+    password: formData.password,
+    profile_image: req.body.image.File
+  };
+  console.log(newUser);
+  res.send('retrieved new user data');
+  
+  /*mySqlConnection.getConnection((err, connection) => {
+    if(err) {
+        throw err;
+    }else {
+        console.log('New User has been added!');
+    }
 
-        connection.query('INSERT INTO users SET ?', params, (err,rows) => { 
+    const params = newUser;
+
+    connection.query('INSERT INTO users SET ?', params, (err,rows) => { 
       
-            connection.release();
+      connection.release();
       
-            if(!err) {
-              res.send(`New record with username: ${params.username} has been added!!`);
-            }else {
-              console.log(err);
-            }
+      if(!err) {
+        res.send(`New record with username: ${params.username} has been added!!`);
+        //TODO: Check if user image is displayed try in posts
+        //TODO: Also images are not saved on local computer
+      }else {
+        console.log(err);
+      }
       
-            console.log(req.body);
+      //console.log(req.body);
         }); 
-    });
+    })*/
 
 };
 

@@ -1,6 +1,8 @@
 const express = require('express')
+//const busBoy = require('connect-busboy')
 const bodyParser = require('body-parser');
-const mySql = require('mysql');
+//const mySql = require('mysql');
+//const fileUpload = require('express-fileupload')
 const path = require('path');
 const postRoutes = require('./routes/post');
 const userRoutes = require('./routes/user');
@@ -14,13 +16,15 @@ app.use((req, res, next) => {
     next();
   });
 
+  //app.use(busBoy());
   app.use(bodyParser.json());
+  //app.use(fileUpload);
   //app/use(bodyParser.urlencoded({ extended: false}));
   
 
 // This is where all codes go
-app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use('./images', express.static(path.join(__dirname, '/images')));
 app.use('/posts', postRoutes);
 app.use('/user', userRoutes);
 
-  module.exports = app;
+module.exports = app;

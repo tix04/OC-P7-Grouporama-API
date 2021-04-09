@@ -1,27 +1,27 @@
 const mySqlConnection = require('../middleware/databaseConnection');
 const fs = require('fs');
+const fileUpload = require('express-fileupload')
 //POST Create User Account
 exports.createUser = (req, res, next) => {
-  //let url = req.protocol + '://' + req.get('host');
-  console.log(req.body);
-  let formData = JSON.parse(req.body.user);
+  let url = req.protocol + '://' + req.get('host');
+  let formData = req.body;
   console.log(formData);
-  let profileImage = req.body.image;
+  let profileImage = req.file;
   console.log(profileImage);
-  let url = req.protocol + '://' + req.get('host') + ':/images/' + profileImage;
-  console.log(url);
+  let image_url =  url + ':/images/' + profileImage.originalname;
+  console.log(image_url);
 
  
-  let newUser = {
+  /*let newUser = {
     first_name: formData.firstName,
     last_name: formData.lastName,
     age: formData.age,
     email: formData.email,
     username: formData.username,
     password: formData.password,
-    profile_image: req.body.image.File
+    profile_image_url: url
   };
-  console.log(newUser);
+  console.log(newUser);*/
   res.send('retrieved new user data');
   
   /*mySqlConnection.getConnection((err, connection) => {

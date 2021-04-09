@@ -10,15 +10,15 @@ const MIME_TYPES = {
 //Store files in images folder and naming files
 const storage = multer.diskStorage({ 
   destination: (req, file, callback) => { 
-    callback(null, '../images');             
+    callback(null, './images');             
   },
   filename: (req, file, callback) => { 
-    const name = req.body.profilePhoto.name.split(' ').join('_');
+    const name = file.originalname.split(' ').join('_');
     console.log(name);
     const extension = MIME_TYPES[file.mimetype];
     
     
-    callback(null, name + Date.now() + '.' + extension);
+    callback(null, file.fieldname + Date.now() + '.' + extension);
     
   },
 });

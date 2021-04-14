@@ -1,6 +1,7 @@
 const mySqlConnection = require('../middleware/databaseConnection');
 const fs = require('fs');
-const fileUpload = require('express-fileupload')
+const fileUpload = require('express-fileupload');
+const { profile } = require('console');
 //POST Create User Account
 exports.createUser = (req, res, next) => {
   let url = req.protocol + '://' + req.get('host');
@@ -8,23 +9,23 @@ exports.createUser = (req, res, next) => {
   console.log(formData);
   let profileImage = req.file;
   console.log(profileImage);
-  let image_url =  url + ':/images/' + profileImage.originalname;
+  let image_url =  url + '/images/' + profileImage.filename; //TODO: Maybe better to use image path
   console.log(image_url);
 
  
-  /*let newUser = {
-    first_name: formData.firstName,
-    last_name: formData.lastName,
+  let newUser = {
+    first_name: formData.first_name,
+    last_name: formData.last_name,
     age: formData.age,
     email: formData.email,
     username: formData.username,
     password: formData.password,
-    profile_image_url: url
+    profile_image: image_url
   };
-  console.log(newUser);*/
-  res.send('retrieved new user data');
+  console.log(newUser);
+  //res.send('retrieved new user data');
   
-  /*mySqlConnection.getConnection((err, connection) => {
+  mySqlConnection.getConnection((err, connection) => {
     if(err) {
         throw err;
     }else {
@@ -40,14 +41,13 @@ exports.createUser = (req, res, next) => {
       if(!err) {
         res.send(`New record with username: ${params.username} has been added!!`);
         //TODO: Check if user image is displayed try in posts
-        //TODO: Also images are not saved on local computer
       }else {
         console.log(err);
       }
       
-      //console.log(req.body);
+      
         }); 
-    })*/
+    });
 
 };
 

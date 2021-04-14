@@ -23,7 +23,7 @@ app.use((req, res, next) => {
   
 
 // This is where all codes go
-app.use('./images', express.static(path.join(__dirname, '/images')));
+app.use('/images', express.static(path.join(__dirname, '/images')));
 app.use('/posts', postRoutes);
 app.use('/user', userRoutes);
 

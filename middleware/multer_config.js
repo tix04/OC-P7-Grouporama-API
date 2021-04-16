@@ -4,7 +4,7 @@ const MIME_TYPES = {
   'image/jpg': 'jpg',
   'image/jpeg': 'jpg',
   'image/png': 'png',
-  'image/gif': 'gif',
+  'image/gif': 'gif' //Tok out comma at the end of this line
 };
 
 //Store files in images folder and naming files

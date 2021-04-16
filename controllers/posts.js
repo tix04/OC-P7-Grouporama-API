@@ -1,18 +1,26 @@
-/*const mySql = require('mysql');
+const mySqlConnection = require('../middleware/databaseConnection');
+const fs = require('fs');
 
-const pool = mySql.createPool({ 
-    connectionLimit : 10,  //Maximum connection allowed. See Documentation
-    host            : 'localhost', //Where database is hosted
-    user            : 'root',      //username
-    password        : '',          //password
-    database        : 'grouporama' //Which database to access
-  });*/
-
-  const mySqlConnection = require('../middleware/databaseConnection');
-  
 //Add a Record in a Post Table
-exports.createPost = (req,res, next) => {
-    mySqlConnection.getConnection((err, connection) => {
+exports.createPost = (req, res, next) => {
+    console.log(req.body)
+    console.log(req.file)
+    /*let url = req.protocol + '://' + req.get('host');
+    let formData = req.body;
+    console.log(formData);
+    let postImage = req.file;
+    console.log(postImage);
+    let image_url = url + '/mediaPosts/' + postImage.filename;
+    console.log(image_url);
+
+    let newPost = {
+        post_content: formData.postContent,
+        post_image: image_url,
+        likes: formData.likes
+    }
+    console.log(newPost);*/
+    res.send('data received');
+    /*mySqlConnection.getConnection((err, connection) => {
         if(err) {
             throw err;
         }else {
@@ -32,7 +40,7 @@ exports.createPost = (req,res, next) => {
             }
             console.log(req.body);
         });
-    });
+    });*/
 };
 
 //GET all Posts from database
@@ -50,7 +58,7 @@ exports.getAllPosts = (req, res, next) => {
         }
         //TODO: Posts with no comments do not display
         //connection.query('SELECT * from posts ORDER BY time_created DESC', (err, rows) => {
-        connection.query('SELECT posts.post_content, posts.attached_files, comments.comment_content FROM posts INNER JOIN comments ON posts.post_id=comments.post_id ORDER BY posts.time_created DESC', (err, rows) => {
+        connection.query('SELECT posts.post_content, posts.post_image, comments.comment_content FROM posts INNER JOIN comments ON posts.post_id=comments.post_id ORDER BY posts.time_created DESC', (err, rows) => {
             if(!err) {
                 console.log(rows);
                 res.send(rows);

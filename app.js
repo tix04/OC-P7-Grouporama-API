@@ -23,9 +23,9 @@ app.use((req, res, next) => {
   
 
 // This is where all codes go
-app.use('/images', express.static(path.join(__dirname, '/images')));
+app.use('/images', express.static(path.join(__dirname, 'images')));
 //app.use('/postImages', express.static(path.join(__dirname, '/mediaPosts')));
-app.use('/posts', postRoutes);
+app.use('/posts', postRoutes);//See if it's possible to save post images in different folder
 app.use('/user', userRoutes);
 
 module.exports = app;

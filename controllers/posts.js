@@ -3,31 +3,33 @@ const fs = require('fs');
 
 //Add a Record in a Post Table
 exports.createPost = (req, res, next) => {
-    console.log(req.body)
-    console.log(req.file)
-    /*let url = req.protocol + '://' + req.get('host');
+    
+    let url = req.protocol + '://' + req.get('host');
     let formData = req.body;
     console.log(formData);
     let postImage = req.file;
     console.log(postImage);
-    let image_url = url + '/mediaPosts/' + postImage.filename;
+    let image_url = url + /*'/mediaPosts/'*/'/images/' + postImage.filename;
     console.log(image_url);
 
     let newPost = {
         post_content: formData.postContent,
+        likes: formData.likes,
+        comments: formData.comments,
         post_image: image_url,
-        likes: formData.likes
+        user_id: 19
+        
     }
-    console.log(newPost);*/
-    res.send('data received');
-    /*mySqlConnection.getConnection((err, connection) => {
+    console.log(newPost);
+    //res.send('data received');
+    mySqlConnection.getConnection((err, connection) => {
         if(err) {
             throw err;
         }else {
             console.log('New Post has been added!');
         }
 
-        const params = req.body;
+        const params = newPost;
 
         connection.query('INSERT INTO posts SET ?', params, (err, rows) => { //Add a Record in a Post Table
 
@@ -40,7 +42,7 @@ exports.createPost = (req, res, next) => {
             }
             console.log(req.body);
         });
-    });*/
+    });
 };
 
 //GET all Posts from database
@@ -58,7 +60,8 @@ exports.getAllPosts = (req, res, next) => {
         }
         //TODO: Posts with no comments do not display
         //connection.query('SELECT * from posts ORDER BY time_created DESC', (err, rows) => {
-        connection.query('SELECT posts.post_content, posts.post_image, comments.comment_content FROM posts INNER JOIN comments ON posts.post_id=comments.post_id ORDER BY posts.time_created DESC', (err, rows) => {
+        //connection.query('SELECT posts.post_content, posts.post_image, comments.comment_content FROM posts INNER JOIN comments ON posts.post_id=comments.post_id ORDER BY posts.time_created DESC', (err, rows) => {
+        connection.query('SELECT posts.post_content, posts.post_image, posts.comments, posts.likes, users.profile_image , users.username FROM posts INNER JOIN users ON posts.user_id=users.user_id ORDER BY posts.time_created DESC', (err, rows) => {
             if(!err) {
                 console.log(rows);
                 res.send(rows);

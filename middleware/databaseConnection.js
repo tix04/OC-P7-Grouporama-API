@@ -5,7 +5,8 @@ const pool = mySql.createPool({
     host            : 'localhost', //Where database is hosted
     user            : 'root',      //username
     password        : '',          //password
-    database        : 'grouporama' //Which database to access
+    database        : 'grouporama', //Which database to access
+    multipleStatements: true
   });
 
   module.exports = pool;

@@ -17,7 +17,7 @@ exports.createPost = (req, res, next) => {
         likes: formData.likes,
         comments: formData.comments,
         post_image: image_url,
-        user_id: 19 //Retrieve this from authentication later. Not hardcoded
+        user_id: 18 //Retrieve this from authentication later. Not hardcoded
         
     }
     console.log(newPost);
@@ -61,7 +61,7 @@ exports.getAllPosts = (req, res, next) => {
         //TODO: Posts with no comments do not display
         //connection.query('SELECT * from posts ORDER BY time_created DESC', (err, rows) => {
         //connection.query('SELECT posts.post_content, posts.post_image, comments.comment_content FROM posts INNER JOIN comments ON posts.post_id=comments.post_id ORDER BY posts.time_created DESC', (err, rows) => {
-        const query1 = 'SELECT posts.post_id, posts.post_content, posts.post_image, posts.comments, posts.likes, users.profile_image , users.username FROM posts INNER JOIN users ON posts.user_id=users.user_id ORDER BY posts.time_created DESC';
+        const query1 = 'SELECT posts.post_id, posts.post_content, posts.post_image, posts.comments, posts.likes, users.profile_image , users.username FROM posts INNER JOIN users ON posts.user_id=users.user_id ORDER BY posts.post_id DESC';
         const query2 = 'SELECT comments.comment_id, comments.comment_content, users.profile_image, users.username, posts.post_id FROM ((comments INNER JOIN users ON comments.user_id=users.user_id) INNER JOIN posts ON comments.post_id=posts.post_id)';
 
         const allPostsQuery = query1 + ';' + query2;

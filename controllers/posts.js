@@ -9,7 +9,7 @@ exports.createPost = (req, res, next) => {
     console.log(formData);
     let postImage = req.file;
     console.log(postImage);
-    let image_url = url + /*'/mediaPosts/'*/'/images/' + postImage.filename;
+    let image_url = url + '/images/' + postImage.filename;
     console.log(image_url);
 
     let newPost = {
@@ -21,7 +21,6 @@ exports.createPost = (req, res, next) => {
         
     }
     console.log(newPost);
-    //res.send('data received');
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
             throw err;
@@ -45,11 +44,6 @@ exports.createPost = (req, res, next) => {
     });
 };
 
-//GET all Posts from database
-/*TODO:
-* Still need to add ability to add Images and video Files
-* Only allow images(jpeg, gif, jpg, bmp) and video(mp4, flv...Check other video files efficient for websites)
-*/
 
 exports.getAllPosts = (req, res, next) => {
     mySqlConnection.getConnection((err, connection) => {
@@ -76,6 +70,7 @@ exports.getAllPosts = (req, res, next) => {
     });
 };
 
+//Retrieve total amount of posts
 exports.getPostsCount = (req, res, next) => {
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
@@ -96,6 +91,7 @@ exports.getPostsCount = (req, res, next) => {
     });
 };
 
+//Update if user has seen all posts
 exports.setNotification = (req, res, next) => {
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
@@ -120,78 +116,90 @@ exports.setNotification = (req, res, next) => {
 *Create a GET method that only returns posts of connected user by user_id
 */
 
-//PUT(Modify)/Update Text posts
+//PUT(Modify)- Edit Text or image posts
 
-exports.modifyTextPost = (req, res, next) => {
-    mySqlConnection.getConnection((err, connection) => {
-        if(err) {
-            throw err;
-        }else {
-            console.log('Post has been modified!');
-        }
+exports.modifyPost = (req, res, next) => {
+    let updatedData = req.body;
+    console.log(updatedData);
+    let updatedImage = req.file;
+    console.log(updatedImage);
+    let url = req.protocol + '://' + req.get('host');
+    
 
-        const params = req.params.post_id;
-        const { post_id, time_created, user_id, likes, comments, content, attached_files } = req.body;
+    const updatedContent = updatedData.postContent;
+    const postID = updatedData.postID;
+    console.log(updatedContent, postID);
 
-        connection.query('UPDATE posts SET content = ? WHERE post_id = ?',[content, params], (err, rows) => {
+    if(updatedImage === null || updatedImage === undefined) {
+        mySqlConnection.getConnection((err, connection) => {
+            if(err) {
+                throw err;
+            }else {
+                console.log('Post has been modified!');
+            }
 
+           connection.query('UPDATE posts SET post_content = ? WHERE post_id = ?', [updatedContent, postID], (err, rows) => {
+            
             connection.release();
 
             if(!err) {
-                res.send(`Post Record has been updated!!`);
+                res.send(`Post text has been updated!!`);
             }else {
                 console.log(err);
             }
 
-            console.log(err);
+           });
+            
         });
-    });
-};
+    }else {
+        let image_url = url + /*'/mediaPosts/'*/'/images/' + updatedImage.filename;
+        mySqlConnection.getConnection((err, connection) => {
+            if(err) {
+                throw err;
+            }else {
+                console.log('Post has been modified!');
+            }
 
-//PUT(Modify)/Update media posts
-
-exports.modifyMediaPost = (req, res, next) => {
-    mySqlConnection.getConnection((err, connection) => {
-        if(err) {
-            throw err;
-        }else {
-            console.log('Post has been modified!');
-        }
-
-        const params = req.params.post_id;
-        const { post_id, time_created, user_id, likes, comments, content, attached_files } = req.body;
-
-        connection.query('UPDATE posts SET content = ? WHERE post_id = ?',[attached_files, params], (err, rows) => {
-
+           connection.query('UPDATE posts SET post_content = ?, post_image = ? WHERE post_id = ?', [updatedContent, image_url ,postID], (err, rows) => {
+            
             connection.release();
 
             if(!err) {
-                res.send(`Post Record has been updated!!`);
+                res.send(`Post text and Image has been updated!!`);
             }else {
                 console.log(err);
             }
 
-            console.log(err);
+           });
+            
         });
-    });
+    }
+   
 };
+
 
 //DELETE Post
 
 exports.deletePost = (req, res, next) => {
+    const postID = req.body.postID;
+    console.log(postID);
+    
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
             throw err;
         }else {
-            console.log('Post has been deleted');
+            console.log(`Post with post_id: ${postID} has been deleted`);
         }
+        const query1 = 'DELETE from comments WHERE post_id = postID';
+        const query2 = 'DELETE from posts WHERE post_id = postID';
+        const allPostsQuery = query1 + ';' + query2;
 
-        connection.query('DELETE from users WHERE user_id = ?',[req.params.post_id], (err, rows) => {
+        connection.query(allPostQuery, (err, rows) => {
 
             connection.release();
 
             if(!err) {
-                res.send(`Post with post_id: ${ [req.params.post_id]} has been deleted!!`);
+                res.send(`Post with post_id: ${postID} has been deleted!!`);
             }else {
                 console.log(err);
             }

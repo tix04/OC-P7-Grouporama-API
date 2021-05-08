@@ -10,8 +10,8 @@ router.get('/', posts.getAllPosts);
 router.get('/postCount', posts.getPostsCount);
 router.post('/newPost',multer , posts.createPost);
 router.put('/newPostStatus', posts.setNotification);
-router.put('/:post_id/content', posts.modifyTextPost);
+router.put('/editPost', multer, posts.modifyPost);
 //router.put('/:post_id', posts.modifyMediaPost);
-router.delete('/:post_id', posts.deletePost);
+router.delete('/delete', posts.deletePost);
 
 module.exports = router;

@@ -1,7 +1,8 @@
 const mySqlConnection = require('../middleware/databaseConnection');
 const fs = require('fs');
-const fileUpload = require('express-fileupload');
-const { profile } = require('console');
+/*const fileUpload = require('express-fileupload');
+const { profile } = require('console');*/
+
 //POST Create User Account
 exports.createUser = (req, res, next) => {
   let url = req.protocol + '://' + req.get('host');
@@ -53,6 +54,7 @@ exports.createUser = (req, res, next) => {
 
 //Get one User by id
 exports.getOneUser = (req, res, next) => {
+    //Get user ID from token authentication or and use it as parameter for SQL Query
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
             throw err;
@@ -235,9 +237,16 @@ exports.deleteUser = (req, res, next) => {
         if(err) {
             throw err;
         }else {
-            console.log('User Account has been deleted!!');
+            console.log(`User Account with user ID: ${[req.params.id]} has been deleted!!`);
         }
 
+        /*
+        *const query1 = 'DELETE from comments WHERE user_id = userID';
+        const query2 = 'DELETE from posts WHERE user_id = userID';
+        const query3 = 'DELETE from users WHERE user_id = userID';
+
+        const allQueries = query1 + ';' + query2 + ';' + query3;
+        */
         connection.query('DELETE from users WHERE user_id = ?',[req.params.user_id], (err,rows) => { 
       
             connection.release();

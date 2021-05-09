@@ -3,6 +3,7 @@ const fs = require('fs');
 /*const fileUpload = require('express-fileupload');
 const { profile } = require('console');*/
 
+
 //POST Create User Account
 exports.createUser = (req, res, next) => {
   let url = req.protocol + '://' + req.get('host');

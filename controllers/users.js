@@ -11,7 +11,7 @@ exports.createUser = (req, res, next) => {
   console.log(formData);
   let profileImage = req.file;
   console.log(profileImage);
-  let image_url =  url + '/images/' + profileImage.filename; //TODO: Maybe better to use image path
+  let image_url =  url + '/images/' + profileImage.filename; 
   console.log(image_url);
 
  
@@ -55,7 +55,7 @@ exports.createUser = (req, res, next) => {
 
 //Get one User by id
 exports.getOneUser = (req, res, next) => {
-    //Get user ID from token authentication or and use it as parameter for SQL Query
+    const userID = req.userId;
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
             throw err;
@@ -63,7 +63,7 @@ exports.getOneUser = (req, res, next) => {
             console.log('User Information retrieved!');
         }
 
-        connection.query('SELECT * from users WHERE user_id = ?',[req.params.user_id], (err,rows) => { 
+        connection.query('SELECT * from users WHERE user_id = ?',[userID], (err,rows) => { 
             connection.release();
       
             if(!err) {
@@ -77,21 +77,22 @@ exports.getOneUser = (req, res, next) => {
 
 //PUT(modify)/Update username for User
 exports.modifyUsername = (req, res, next) => {
+  const userID = req.userId;
+  const username = req.body;
+
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
           throw err
         }else{
           console.log('Username has been updated!');
         }
-        const params =  req.params.user_id;
-        const {user_id, username, password, first_name, last_name, age, email} = req.body;
-
-        connection.query('UPDATE users SET username = ? WHERE user_id = ?',[username, params], (err,rows) => { 
+        
+        connection.query('UPDATE users SET username = ? WHERE user_id = ?',[username, userID], (err,rows) => { 
       
             connection.release();
       
             if(!err) {
-              res.send(`Username of User with id ${params} has been updated!!`);
+              res.send(`Username has been updated!!`);
             }else {
               console.log(err);
             }
@@ -103,21 +104,23 @@ exports.modifyUsername = (req, res, next) => {
 
 //PUT(modify)/Update password for User
 exports.modifyUserPassword = (req, res, next) => {
+    const userID = req.userId;
+    const password = req.body;
+
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
           throw err
         }else{
           console.log('User password has been updated!');
         }
-        const params =  req.params.user_id;
-        const {user_id, username, password, first_name, last_name, age, email} = req.body;
+        
 
-        connection.query('UPDATE users SET password = ? WHERE user_id = ?',[password, params], (err,rows) => { 
+        connection.query('UPDATE users SET password = ? WHERE user_id = ?',[password, userID], (err,rows) => { 
       
             connection.release();
       
             if(!err) {
-              res.send(`Password of User with id ${params} has been updated!!`);
+              res.send(`User Password has been updated!!`);
             }else {
               console.log(err);
             }
@@ -129,21 +132,23 @@ exports.modifyUserPassword = (req, res, next) => {
 
 //PUT(modify)/Update first_name for User
 exports.modifyFirstName = (req, res, next) => {
+    const userID = req.userId;
+    const firstName = req.body;
+
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
           throw err
         }else{
           console.log('User first name has been updated!');
         }
-        const params =  req.params.user_id;
-        const {user_id, username, password, first_name, last_name, age, email} = req.body;
+        
 
-        connection.query('UPDATE users SET first_name = ? WHERE user_id = ?',[first_name, params], (err,rows) => { 
+        connection.query('UPDATE users SET first_name = ? WHERE user_id = ?',[firstName, userID], (err,rows) => { 
       
             connection.release();
       
             if(!err) {
-              res.send(`First Name of User with id ${params} has been updated!!`);
+              res.send(`First Name of User has been updated!!`);
             }else {
               console.log(err);
             }
@@ -155,21 +160,23 @@ exports.modifyFirstName = (req, res, next) => {
 
 //PUT(modify)/Update last_name for User
 exports.modifyLastName = (req, res, next) => {
+    const userID = req.userId;
+    const lasttName = req.body;
+
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
           throw err
         }else{
           console.log('User last name has been updated!');
         }
-        const params =  req.params.user_id;
-        const {user_id, username, password, first_name, last_name, age, email} = req.body;
+        
 
-        connection.query('UPDATE users SET last_name = ? WHERE user_id = ?',[last_name, params], (err,rows) => { 
+        connection.query('UPDATE users SET last_name = ? WHERE user_id = ?',[lastName, userID], (err,rows) => { 
       
             connection.release();
       
             if(!err) {
-              res.send(`Last Name of User with id ${params} has been updated!!`);
+              res.send(`Last Name of User has been updated!!`);
             }else {
               console.log(err);
             }
@@ -181,21 +188,22 @@ exports.modifyLastName = (req, res, next) => {
 
 //PUT(modify)/Update age for User
 exports.modifyUserAge = (req, res, next) => {
+    const userID = req.userId;
+    const age = req.body;
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
           throw err
         }else{
           console.log('User age has been updated!');
         }
-        const params =  req.params.user_id;
-        const {user_id, username, password, first_name, last_name, age, email} = req.body;
+        
 
-        connection.query('UPDATE users SET age = ? WHERE user_id = ?',[age, params], (err,rows) => { 
+        connection.query('UPDATE users SET age = ? WHERE user_id = ?',[age, userID], (err,rows) => { 
       
             connection.release();
       
             if(!err) {
-              res.send(`Age of User with id ${params} has been updated!!`);
+              res.send(`Age of User has been updated!!`);
             }else {
               console.log(err);
             }
@@ -207,21 +215,22 @@ exports.modifyUserAge = (req, res, next) => {
 
 //PUT(modify)/Update email for User
 exports.modifyUserEmail = (req, res, next) => {
+    const userID = req.userId;
+    const email = req.body;
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
           throw err
         }else{
           console.log('User email has been updated!');
         }
-        const params =  req.params.user_id;
-        const {user_id, username, password, first_name, last_name, age, email} = req.body;
+        
 
-        connection.query('UPDATE users SET email = ? WHERE user_id = ?',[email, params], (err,rows) => { 
+        connection.query('UPDATE users SET email = ? WHERE user_id = ?',[email, userID], (err,rows) => { 
       
             connection.release();
       
             if(!err) {
-              res.send(`Email of User with id ${params} has been updated!!`);
+              res.send(`Email of User has been updated!!`);
             }else {
               console.log(err);
             }
@@ -231,14 +240,17 @@ exports.modifyUserEmail = (req, res, next) => {
     });
 };
 
+
 //DELETE User account
 
 exports.deleteUser = (req, res, next) => {
+  const userID = req.userId;
+
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
             throw err;
         }else {
-            console.log(`User Account with user ID: ${[req.params.id]} has been deleted!!`);
+            console.log(`User Account has been deleted!!`);
         }
 
         /*
@@ -248,12 +260,12 @@ exports.deleteUser = (req, res, next) => {
 
         const allQueries = query1 + ';' + query2 + ';' + query3;
         */
-        connection.query('DELETE from users WHERE user_id = ?',[req.params.user_id], (err,rows) => { 
+        connection.query('DELETE from users WHERE user_id = ?',[userID], (err,rows) => { 
       
             connection.release();
       
             if(!err) {
-              res.send(`User Account with user ID: ${[req.params.id]} has been deleted!!`);
+              res.send(`User Account has been deleted!!`);
             }else {
               console.log(err);
             }

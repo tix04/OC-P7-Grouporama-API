@@ -11,13 +11,14 @@ exports.createPost = (req, res, next) => {
     console.log(postImage);
     let image_url = url + '/images/' + postImage.filename;
     console.log(image_url);
+    let userId = req.userId;
 
     let newPost = {
         post_content: formData.postContent,
         likes: formData.likes,
         comments: formData.comments,
         post_image: image_url,
-        user_id: 18 //Retrieve this from authentication later. Not hardcoded
+        user_id: userId //Retrieve this from authentication later. Not hardcoded
         
     }
     console.log(newPost);
@@ -46,6 +47,8 @@ exports.createPost = (req, res, next) => {
 
 
 exports.getAllPosts = (req, res, next) => {
+    const data = [{userId: req.userId}];
+    console.log('in posts', data);
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
             throw err;
@@ -55,12 +58,14 @@ exports.getAllPosts = (req, res, next) => {
         //TODO: Posts with no comments do not display
         //connection.query('SELECT * from posts ORDER BY time_created DESC', (err, rows) => {
         //connection.query('SELECT posts.post_content, posts.post_image, comments.comment_content FROM posts INNER JOIN comments ON posts.post_id=comments.post_id ORDER BY posts.time_created DESC', (err, rows) => {
-        const query1 = 'SELECT posts.post_id, posts.post_content, posts.post_image, posts.comments, posts.likes, users.profile_image , users.username FROM posts INNER JOIN users ON posts.user_id=users.user_id ORDER BY posts.post_id DESC';
+        const query1 = 'SELECT posts.post_id, posts.post_content, posts.post_image, posts.comments, posts.likes, posts.likes_array, users.profile_image , users.username FROM posts INNER JOIN users ON posts.user_id=users.user_id ORDER BY posts.post_id DESC';
         const query2 = 'SELECT comments.comment_id, comments.comment_content, users.profile_image, users.username, posts.post_id FROM ((comments INNER JOIN users ON comments.user_id=users.user_id) INNER JOIN posts ON comments.post_id=posts.post_id)';
 
         const allPostsQuery = query1 + ';' + query2;
         connection.query(allPostsQuery , (err, rows) => {
             if(!err) {
+                console.log(rows);
+                rows.push(data);
                 console.log(rows);
                 res.send(rows);
             }else {
@@ -76,7 +81,7 @@ exports.getPostsCount = (req, res, next) => {
         if(err) {
             throw err;
         }else {
-            console.log('Number of Posts Amount retrieved');
+            console.log('Number of Total Posts retrieved');
         }
 
         connection.query('SELECT COUNT(post_id) AS postsCount, viewed_posts FROM posts, poststatus', (err,count) => {
@@ -112,9 +117,38 @@ exports.setNotification = (req, res, next) => {
     });
 };
 
-/*TODO:
-*Create a GET method that only returns posts of connected user by user_id
-*/
+//Update Likes on post
+exports.setLikes = (req, res, next) => {
+    const postID = req.body.data.postID;
+    const likesArray = req.body.data.likesArray;
+
+    const likesTotal = likesArray.length;
+
+    console.log(postID, likesArray, likesTotal);
+
+    const stringArray = JSON.stringify(likesArray);
+    console.log(stringArray);
+
+    //res.send('Likes Test Successful');
+
+    mySqlConnection.getConnection((err, connection) => {
+        if(err) {
+            throw err;
+        }else { 
+            console.log('Likes have been updated');
+        }
+
+        const query = 'UPDATE posts SET likes = ?, likes_array = ? WHERE post_id = ?'
+        connection.query(query , [likesTotal ,stringArray ,postID] ,(err, response) => {
+            if(!err) {
+
+                res.send(`Likes have been updated`);
+            }else {
+                console.log(err);
+            }
+        });
+    });
+};
 
 //PUT(Modify)- Edit Text or image posts
 

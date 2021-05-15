@@ -58,7 +58,7 @@ exports.getAllPosts = (req, res, next) => {
         //TODO: Posts with no comments do not display
         //connection.query('SELECT * from posts ORDER BY time_created DESC', (err, rows) => {
         //connection.query('SELECT posts.post_content, posts.post_image, comments.comment_content FROM posts INNER JOIN comments ON posts.post_id=comments.post_id ORDER BY posts.time_created DESC', (err, rows) => {
-        const query1 = 'SELECT posts.post_id, posts.post_content, posts.post_image, posts.comments, posts.likes, posts.likes_array, users.profile_image , users.username FROM posts INNER JOIN users ON posts.user_id=users.user_id ORDER BY posts.post_id DESC';
+        const query1 = 'SELECT posts.post_id, posts.post_content, posts.post_image, posts.comments, posts.likes, posts.likes_array, posts.user_id, users.profile_image , users.username FROM posts INNER JOIN users ON posts.user_id=users.user_id ORDER BY posts.time_created DESC';
         const query2 = 'SELECT comments.comment_id, comments.comment_content, users.profile_image, users.username, posts.post_id FROM ((comments INNER JOIN users ON comments.user_id=users.user_id) INNER JOIN posts ON comments.post_id=posts.post_id)';
 
         const allPostsQuery = query1 + ';' + query2;
@@ -84,7 +84,13 @@ exports.getPostsCount = (req, res, next) => {
             console.log('Number of Total Posts retrieved');
         }
 
-        connection.query('SELECT COUNT(post_id) AS postsCount, viewed_posts FROM posts, poststatus', (err,count) => {
+        const query1 = 'SELECT COUNT(post_id) AS postsCount FROM posts';
+        const query2 = `SELECT viewed_posts FROM users WHERE user_id = ${req.userId}`;
+
+        const fullQuery = query1 + ';' + query2;
+         
+
+        connection.query(fullQuery, (err,count) => {
             if(!err) {
                 
                 console.log(count);
@@ -98,6 +104,7 @@ exports.getPostsCount = (req, res, next) => {
 
 //Update if user has seen all posts
 exports.setNotification = (req, res, next) => {
+    const userID = req.userId;
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
             throw err;
@@ -106,7 +113,7 @@ exports.setNotification = (req, res, next) => {
         }
 
         console.log(req.body.count);
-        connection.query('UPDATE poststatus SET viewed_posts = ? WHERE summary_id=1', [req.body.count],(err, count) => {
+        connection.query('UPDATE users SET viewed_posts = ? WHERE user_id = ?', [req.body.count, userID],(err, count) => {
             if(!err) {
 
                 res.send(`You have viewed all new posts`);
@@ -222,18 +229,20 @@ exports.deletePost = (req, res, next) => {
         if(err) {
             throw err;
         }else {
-            console.log(`Post with post_id: ${postID} has been deleted`);
+            console.log(`Post has been deleted`);
         }
-        const query1 = 'DELETE from comments WHERE post_id = postID';
-        const query2 = 'DELETE from posts WHERE post_id = postID';
-        const allPostsQuery = query1 + ';' + query2;
+        const query1 = `DELETE from comments WHERE post_id = ${postID}`;
+        const query2 = `DELETE from posts WHERE post_id = ${postID}`;
+        const query3 = `UPDATE users SET viewed_posts = viewed_posts - 1`;
 
-        connection.query(allPostQuery, (err, rows) => {
+        const allPostsQuery = query1 + ';' + query2 + ';' + query3;
+
+        connection.query(allPostsQuery, (err, rows) => {
 
             connection.release();
 
             if(!err) {
-                res.send(`Post with post_id: ${postID} has been deleted!!`);
+                res.send(`Post has been deleted!!`);
             }else {
                 console.log(err);
             }

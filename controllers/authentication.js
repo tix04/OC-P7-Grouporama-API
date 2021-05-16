@@ -37,7 +37,8 @@ exports.logIn = (req, res, next) => {
                 //res.send("User successfully logged in");
                 res.status(200).json({
                     message: "User succesfully logged in",
-                    token: token
+                    token: token,
+                    profileImage: results[0].profile_image
                 });
             }else {
                 //res.send("Password does not match");

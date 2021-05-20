@@ -7,7 +7,7 @@ exports.createComment = (req, res, next) => {
     console.log(commentData);
 
     let newComment = {
-        user_id: 17, //Make sure to retrieve this from authentication later
+        user_id: commentData.userID, //Make sure to retrieve this from authentication later
         post_id: commentData.postID,
         comment_content: commentData.commentContent,
         

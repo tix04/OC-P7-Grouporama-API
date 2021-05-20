@@ -8,11 +8,13 @@ module.exports = (req, res, next) => {
     const decodedToken = jwt.verify(token, 'GROUPORAMA_SECRET_TOKEN_P7'); 
    
     const userId = decodedToken.userID;
+    const profileImage = decodedToken.profileImage;
     if (req.body.userId && req.body.userId !== userId) {
       throw 'Invalid user ID';
     } else {
       console.log('succeeded auth test');
       req.userId = userId;
+      req.profileImage = profileImage;
       next();
     }
   } catch(err) {

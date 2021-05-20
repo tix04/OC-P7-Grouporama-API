@@ -12,7 +12,9 @@ exports.createPost = (req, res, next) => {
     let image_url = url + '/images/' + postImage.filename;
     console.log(image_url);
     let userId = req.userId;
-
+    
+    //let profileImage = req.profileImage
+;
     let newPost = {
         post_content: formData.postContent,
         likes: formData.likes,
@@ -47,7 +49,7 @@ exports.createPost = (req, res, next) => {
 
 
 exports.getAllPosts = (req, res, next) => {
-    const data = [{userId: req.userId}];
+    const data = [{userId: req.userId, profileImage: req.profileImage}];
     console.log('in posts', data);
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
@@ -117,6 +119,28 @@ exports.setNotification = (req, res, next) => {
             if(!err) {
 
                 res.send(`You have viewed all new posts`);
+            }else {
+                console.log(err);
+            }
+        });
+    });
+};
+
+//Check Likes status
+exports.checkLikes = (req, res, next) => {
+    const postID = req.params.id;
+    
+   
+    mySqlConnection.getConnection((err, connection) => {
+        if(err) {
+            throw err;
+        }else {
+            console.log('Like Status Checked');
+        }
+
+        connection.query('SELECT likes_array FROM posts WHERE post_id = ?', [postID],(err, likesArray) => {
+            if(!err) {
+                res.send(likesArray);
             }else {
                 console.log(err);
             }

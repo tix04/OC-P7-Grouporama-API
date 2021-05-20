@@ -30,15 +30,14 @@ exports.logIn = (req, res, next) => {
             if(password === results[0].password) {
                 console.log(results[0].user_id);
                 const token = jwt.sign(
-                    {userID: results[0].user_id},
+                    {userID: results[0].user_id, profileImage: results[0].profile_image},
                     'GROUPORAMA_SECRET_TOKEN_P7',
                     { expiresIn: '24h'}
                 );
                 //res.send("User successfully logged in");
                 res.status(200).json({
                     message: "User succesfully logged in",
-                    token: token,
-                    profileImage: results[0].profile_image
+                    token: token
                 });
             }else {
                 //res.send("Password does not match");

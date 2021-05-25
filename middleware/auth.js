@@ -14,7 +14,6 @@ module.exports = (req, res, next) => {
     } else {
       console.log('succeeded auth test');
       req.userId = userId;
-      req.profileImage = profileImage;
       next();
     }
   } catch(err) {

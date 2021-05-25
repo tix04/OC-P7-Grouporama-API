@@ -49,7 +49,7 @@ exports.createPost = (req, res, next) => {
 
 
 exports.getAllPosts = (req, res, next) => {
-    const data = [{userId: req.userId, profileImage: req.profileImage}];
+    const data = [{userId: req.userId}];
     console.log('in posts', data);
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
@@ -62,8 +62,9 @@ exports.getAllPosts = (req, res, next) => {
         //connection.query('SELECT posts.post_content, posts.post_image, comments.comment_content FROM posts INNER JOIN comments ON posts.post_id=comments.post_id ORDER BY posts.time_created DESC', (err, rows) => {
         const query1 = 'SELECT posts.post_id, posts.post_content, posts.post_image, posts.comments, posts.likes, posts.likes_array, posts.user_id, users.profile_image , users.username FROM posts INNER JOIN users ON posts.user_id=users.user_id ORDER BY posts.time_created DESC';
         const query2 = 'SELECT comments.comment_id, comments.comment_content, users.profile_image, users.username, posts.post_id FROM ((comments INNER JOIN users ON comments.user_id=users.user_id) INNER JOIN posts ON comments.post_id=posts.post_id)';
+        const query3 = `SELECT profile_image FROM users WHERE user_id=${req.userId}`;
 
-        const allPostsQuery = query1 + ';' + query2;
+        const allPostsQuery = query1 + ';' + query2 + ';' + query3;
         connection.query(allPostsQuery , (err, rows) => {
             if(!err) {
                 console.log(rows);

@@ -25,9 +25,9 @@ exports.createUser = (req, res, next) => {
     profile_image: image_url
   };
   console.log(newUser);
-  //res.send('retrieved new user data');
+  res.send('retrieved new user data');
   
-  mySqlConnection.getConnection((err, connection) => {
+  /*mySqlConnection.getConnection((err, connection) => {
     if(err) {
         throw err;
     }else {
@@ -49,7 +49,7 @@ exports.createUser = (req, res, next) => {
       
       
         }); 
-    });
+    });*/
 
 };
 
@@ -75,14 +75,44 @@ exports.getOneUser = (req, res, next) => {
     });
 };
 
+//PUT(modify)/Update profile picture for user
+exports.modifyProfilePhoto = (req, res, next) => {
+ let url = req.protocol + '://' + req.get('host');
+ let newProfilePhoto = req.file;
+ let userID = req.userId;
+ let updatedImageUrl = url + '/images/' + newProfilePhoto.filename;
+  console.log('this is the new profile Photo!!', userID, updatedImageUrl);
+
+  mySqlConnection.getConnection((err, connection) => {
+    if(err) {
+      throw err;
+    }else {
+      console.log('Profile Image has been updated!');
+    }
+
+    connection.query('UPDATE users SET profile_image = ? WHERE user_id = ?',[updatedImageUrl, userID], (err, rows) => {
+
+      connection.release();
+
+      if(!err) {
+        res.send('Profile Photo has been updated');
+      }else {
+        console.log(err);
+      }
+
+    });
+  });
+  
+};
+
 //PUT(modify)/Update username for User
 exports.modifyUsername = (req, res, next) => {
   const userID = req.userId;
-  const username = req.body;
+  const username = req.body.username;
 
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
-          throw err
+          throw err;
         }else{
           console.log('Username has been updated!');
         }
@@ -97,7 +127,7 @@ exports.modifyUsername = (req, res, next) => {
               console.log(err);
             }
       
-            console.log(req.body);
+            
         }); 
     });
 };
@@ -105,7 +135,7 @@ exports.modifyUsername = (req, res, next) => {
 //PUT(modify)/Update password for User
 exports.modifyUserPassword = (req, res, next) => {
     const userID = req.userId;
-    const password = req.body;
+    const password = req.body.password;
 
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
@@ -133,11 +163,12 @@ exports.modifyUserPassword = (req, res, next) => {
 //PUT(modify)/Update first_name for User
 exports.modifyFirstName = (req, res, next) => {
     const userID = req.userId;
-    const firstName = req.body;
+    const firstName = req.body.firstName;
 
+    
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
-          throw err
+          throw err;
         }else{
           console.log('User first name has been updated!');
         }
@@ -148,12 +179,12 @@ exports.modifyFirstName = (req, res, next) => {
             connection.release();
       
             if(!err) {
-              res.send(`First Name of User has been updated!!`);
+              res.send('User First Name has been updated!!');
             }else {
               console.log(err);
             }
       
-            console.log(req.body);
+            
         }); 
     });
 };
@@ -161,13 +192,13 @@ exports.modifyFirstName = (req, res, next) => {
 //PUT(modify)/Update last_name for User
 exports.modifyLastName = (req, res, next) => {
     const userID = req.userId;
-    const lasttName = req.body;
+    const lastName = req.body.lastName;
 
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
-          throw err
+          throw err;
         }else{
-          console.log('User last name has been updated!');
+          console.log('User Last Name has been updated!');
         }
         
 
@@ -176,7 +207,7 @@ exports.modifyLastName = (req, res, next) => {
             connection.release();
       
             if(!err) {
-              res.send(`Last Name of User has been updated!!`);
+              res.send('Your Last Name has been updated!!');
             }else {
               console.log(err);
             }
@@ -189,7 +220,7 @@ exports.modifyLastName = (req, res, next) => {
 //PUT(modify)/Update age for User
 exports.modifyUserAge = (req, res, next) => {
     const userID = req.userId;
-    const age = req.body;
+    const age = req.body.age;
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
           throw err
@@ -203,7 +234,7 @@ exports.modifyUserAge = (req, res, next) => {
             connection.release();
       
             if(!err) {
-              res.send(`Age of User has been updated!!`);
+              res.send('Your Age has been updated!!');
             }else {
               console.log(err);
             }
@@ -216,7 +247,7 @@ exports.modifyUserAge = (req, res, next) => {
 //PUT(modify)/Update email for User
 exports.modifyUserEmail = (req, res, next) => {
     const userID = req.userId;
-    const email = req.body;
+    const email = req.body.email;
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
           throw err

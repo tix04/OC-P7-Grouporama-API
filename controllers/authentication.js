@@ -62,7 +62,7 @@ exports.verifyUsername = (req, res, next) => {
     if(err) {
         throw err;
     }else {
-        console.log('User Logged in Successfully!');
+        console.log('Username List sent!');
     }
 
     connection.query('SELECT username FROM users', (err, rows) => {
@@ -70,7 +70,41 @@ exports.verifyUsername = (req, res, next) => {
       connection.release();
 
       if(!err) {
-        res.send(rows);
+        console.log(rows);
+        let usernameList = [];
+        for (let i = 0;i < rows.length;i++) {
+          usernameList.push(rows[i].username);
+        }
+        console.log(usernameList);
+        res.send(usernameList);
+      }else {
+        console.log(err);
+      }
+    });
+  });
+};
+
+exports.verifyEmail = (req, res, next) => {
+
+  mySqlConnection.getConnection((err, connection) => {
+    if(err) {
+        throw err;
+    }else {
+        console.log('Emails List Sent!');
+    }
+
+    connection.query('SELECT email FROM users', (err, rows) => {
+      
+      connection.release();
+
+      if(!err) {
+        console.log(rows);
+        let emailList = [];
+        for (let i = 0;i < rows.length;i++) {
+          emailList.push(rows[i].email);
+        }
+        console.log(emailList);
+        res.send(emailList);
       }else {
         console.log(err);
       }

@@ -25,9 +25,9 @@ exports.createUser = (req, res, next) => {
     profile_image: image_url
   };
   console.log(newUser);
-  res.send('retrieved new user data');
+  //res.send('retrieved new user data');
   
-  /*mySqlConnection.getConnection((err, connection) => {
+  mySqlConnection.getConnection((err, connection) => {
     if(err) {
         throw err;
     }else {
@@ -49,7 +49,7 @@ exports.createUser = (req, res, next) => {
       
       
         }); 
-    });*/
+    });
 
 };
 
@@ -135,8 +135,10 @@ exports.modifyUsername = (req, res, next) => {
 //PUT(modify)/Update password for User
 exports.modifyUserPassword = (req, res, next) => {
     const userID = req.userId;
-    const password = req.body.password;
+    const password = req.body.newPassword;
 
+    console.log(userID, password);
+    //res.send('Password Data received!!');
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
           throw err
@@ -155,7 +157,7 @@ exports.modifyUserPassword = (req, res, next) => {
               console.log(err);
             }
       
-            console.log(req.body);
+            
         }); 
     });
 };

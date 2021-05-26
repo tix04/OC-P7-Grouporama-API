@@ -55,3 +55,25 @@ exports.logIn = (req, res, next) => {
       });
     });
   };
+
+exports.verifyUsername = (req, res, next) => {
+
+  mySqlConnection.getConnection((err, connection) => {
+    if(err) {
+        throw err;
+    }else {
+        console.log('User Logged in Successfully!');
+    }
+
+    connection.query('SELECT username FROM users', (err, rows) => {
+      
+      connection.release();
+
+      if(!err) {
+        res.send(rows);
+      }else {
+        console.log(err);
+      }
+    });
+  });
+};

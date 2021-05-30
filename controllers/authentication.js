@@ -32,15 +32,15 @@ exports.logIn = (req, res, next) => {
                 const token = jwt.sign(
                     {userID: results[0].user_id},
                     'GROUPORAMA_SECRET_TOKEN_P7',
-                    { expiresIn: '24h'}
+                    { expiresIn: '24h' }
                 );
-                //res.send("User successfully logged in");
+               
                 res.status(200).json({
                     message: "User succesfully logged in",
                     token: token
                 });
             }else {
-                //res.send("Password does not match");
+                
               res.status(401).json({
                 message: "Password does not match"
               });

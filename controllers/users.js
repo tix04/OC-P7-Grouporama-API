@@ -1,8 +1,7 @@
 const mySqlConnection = require('../middleware/databaseConnection');
 const fs = require('fs');
-/*const fileUpload = require('express-fileupload');
-const { profile } = require('console');*/
 
+const jwt = require('jsonwebtoken');
 
 //POST Create User Account
 exports.createUser = (req, res, next) => {
@@ -25,24 +24,36 @@ exports.createUser = (req, res, next) => {
     profile_image: image_url
   };
   console.log(newUser);
-  //res.send('retrieved new user data');
   
   mySqlConnection.getConnection((err, connection) => {
     if(err) {
         throw err;
     }else {
-        console.log('New User has been added!');
+        console.log('Your Account has been created!!');
     }
 
     const params = newUser;
+    const query1 = 'INSERT INTO users SET ?';
+    const query2 = 'SELECT user_id FROM users where username = ?';
 
-    connection.query('INSERT INTO users SET ?', params, (err,rows) => { 
+    const fullQuery = query1 + ';' + query2;
+
+    connection.query(fullQuery, [params, newUser.username], (err,rows) => { 
       
       connection.release();
       
       if(!err) {
-        res.send(`New record with username: ${params.username} has been added!!`);
-        //TODO: Check if user image is displayed try in posts
+        const token = jwt.sign(
+          {userID: rows[0].insertId},
+          'GROUPORAMA_SECRET_TOKEN_P7',
+          { expiresIn: '24h' }
+        );
+
+        res.status(200).json({
+          message: 'Your Account has been created!!',
+          token: token
+        });
+
       }else {
         console.log(err);
       }
@@ -223,6 +234,7 @@ exports.modifyLastName = (req, res, next) => {
 exports.modifyUserAge = (req, res, next) => {
     const userID = req.userId;
     const age = req.body.age;
+
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
           throw err

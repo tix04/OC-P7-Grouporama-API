@@ -3,27 +3,45 @@ const fs = require('fs');
 
 //Add a Record in a Post Table
 exports.createPost = (req, res, next) => {
-    
-    let url = req.protocol + '://' + req.get('host');
+    let url, postImage, image_url, newPost;
     let formData = req.body;
-    console.log(formData);
-    let postImage = req.file;
-    console.log(postImage);
-    let image_url = url + '/images/' + postImage.filename;
-    console.log(image_url);
     let userId = req.userId;
-    
-    //let profileImage = req.profileImage
-;
-    let newPost = {
-        post_content: formData.postContent,
-        likes: formData.likes,
-        comments: formData.comments,
-        post_image: image_url,
-        user_id: userId //Retrieve this from authentication later. Not hardcoded
-        
+    let likesArray = '[]';
+
+    console.log(formData);
+
+    if(req.file) {
+        url = req.protocol + '://' + req.get('host');
+        postImage = req.file;
+        image_url = url + '/images/' + postImage.filename;
+
+        console.log(postImage);
+        console.log(image_url);
+
+        newPost = {
+            post_content: formData.postContent,
+            likes: formData.likes,
+            comments: formData.comments,
+            post_image: image_url,
+            user_id: userId,
+            likes_array: likesArray
+        };
+
+        console.log(newPost);
+
+    }else {
+        newPost = {
+            post_content: formData.postContent,
+            likes: formData.likes,
+            comments: formData.comments,
+            post_image: '',
+            user_id: userId,
+            likes_array: likesArray
+        };
+
+        console.log(newPost);
     }
-    console.log(newPost);
+    
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
             throw err;
@@ -33,7 +51,7 @@ exports.createPost = (req, res, next) => {
 
         const params = newPost;
 
-        connection.query('INSERT INTO posts SET ?', params, (err, rows) => { //Add a Record in a Post Table
+        connection.query('INSERT INTO posts SET ?', params, (err, rows) => {
 
             connection.release();
 
@@ -62,7 +80,7 @@ exports.getAllPosts = (req, res, next) => {
         //connection.query('SELECT posts.post_content, posts.post_image, comments.comment_content FROM posts INNER JOIN comments ON posts.post_id=comments.post_id ORDER BY posts.time_created DESC', (err, rows) => {
         const query1 = 'SELECT posts.post_id, posts.post_content, posts.post_image, posts.comments, posts.likes, posts.likes_array, posts.user_id, users.profile_image , users.username FROM posts INNER JOIN users ON posts.user_id=users.user_id ORDER BY posts.time_created DESC';
         const query2 = 'SELECT comments.comment_id, comments.comment_content, users.profile_image, users.username, posts.post_id FROM ((comments INNER JOIN users ON comments.user_id=users.user_id) INNER JOIN posts ON comments.post_id=posts.post_id)';
-        const query3 = `SELECT profile_image FROM users WHERE user_id=${req.userId}`;
+        const query3 = `SELECT profile_image, username FROM users WHERE user_id=${req.userId}`;
 
         const allPostsQuery = query1 + ';' + query2 + ';' + query3;
         connection.query(allPostsQuery , (err, rows) => {
@@ -186,9 +204,7 @@ exports.setLikes = (req, res, next) => {
 
 exports.modifyPost = (req, res, next) => {
     let updatedData = req.body;
-    console.log(updatedData);
     let updatedImage = req.file;
-    console.log(updatedImage);
     let url = req.protocol + '://' + req.get('host');
     
 
@@ -218,7 +234,7 @@ exports.modifyPost = (req, res, next) => {
             
         });
     }else {
-        let image_url = url + /*'/mediaPosts/'*/'/images/' + updatedImage.filename;
+        let image_url = url + '/images/' + updatedImage.filename;
         mySqlConnection.getConnection((err, connection) => {
             if(err) {
                 throw err;

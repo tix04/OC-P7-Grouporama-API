@@ -1,28 +1,57 @@
 const mySqlConnection = require('../middleware/databaseConnection');
 const fs = require('fs');
+const path = require('path');
+const express = require('express');
 
 const jwt = require('jsonwebtoken');
 
 //POST Create User Account
 exports.createUser = (req, res, next) => {
   let url = req.protocol + '://' + req.get('host');
-  let formData = req.body;
-  console.log(formData);
-  let profileImage = req.file;
-  console.log(profileImage);
-  let image_url =  url + '/images/' + profileImage.filename; 
-  console.log(image_url);
+  
+  let firstName = req.body.first_name;
+  let lastName = req.body.last_name;
+  let age = req.body.age;
+  let email = req.body.email.toLowerCase();
+  let username = req.body.username.toLowerCase();
+  let password = req.body.password;
 
- 
-  let newUser = {
-    first_name: formData.first_name,
-    last_name: formData.last_name,
-    age: formData.age,
-    email: formData.email,
-    username: formData.username,
-    password: formData.password,
-    profile_image: image_url
-  };
+  let mimetypeRegExp = /jpeg|jpg|png|gif/;
+
+  let newUser, image_url, profileImage;
+  
+  if(req.file === null || req.file === undefined ) {
+   
+    newUser = {
+      first_name: firstName,
+      last_name: lastName,
+      age: age,
+      email: email,
+      username: username,
+      password: password
+      
+    };
+  }else {
+    profileImage = req.file;
+    image_url =  url + '/images/' + profileImage.filename;
+
+    if (!mimetypeRegExp.test(mimetype)) {
+        res.status(415).json({ //Changed error code
+        message: 'Only .png, .jpg and .jpeg files are allowed!'
+      });
+    }
+    
+    newUser = {
+      first_name: firstName,
+      last_name: lastName,
+      age: age,
+      email: email,
+      username: username,
+      password: password,
+      profile_image: image_url
+    };
+  }
+
   console.log(newUser);
   
   mySqlConnection.getConnection((err, connection) => {
@@ -119,7 +148,7 @@ exports.modifyProfilePhoto = (req, res, next) => {
 //PUT(modify)/Update username for User
 exports.modifyUsername = (req, res, next) => {
   const userID = req.userId;
-  const username = req.body.username;
+  const username = req.body.username.toLowerCase();
 
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
@@ -261,7 +290,7 @@ exports.modifyUserAge = (req, res, next) => {
 //PUT(modify)/Update email for User
 exports.modifyUserEmail = (req, res, next) => {
     const userID = req.userId;
-    const email = req.body.email;
+    const email = req.body.email.toLowerCase();
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
           throw err
@@ -290,6 +319,8 @@ exports.modifyUserEmail = (req, res, next) => {
 
 exports.deleteUser = (req, res, next) => {
   const userID = req.userId;
+  const totalPosts = req.body.totalPosts;
+
 
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
@@ -298,14 +329,14 @@ exports.deleteUser = (req, res, next) => {
             console.log(`User Account has been deleted!!`);
         }
 
-        /*
-        *const query1 = 'DELETE from comments WHERE user_id = userID';
-        const query2 = 'DELETE from posts WHERE user_id = userID';
-        const query3 = 'DELETE from users WHERE user_id = userID';
+        
+        const query1 = 'DELETE from posts WHERE user_id = ?';
+        const query2 = 'DELETE from users WHERE user_id = ?';
+        const query3 = `UPDATE users SET viewed_posts = viewed_posts - ${totalPosts} WHERE viewed_posts > 0`;
 
         const allQueries = query1 + ';' + query2 + ';' + query3;
-        */
-        connection.query('DELETE from users WHERE user_id = ?',[userID], (err,rows) => { 
+        
+        connection.query(allQueries, [userID, userID], (err,rows) => { 
       
             connection.release();
       

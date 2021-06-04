@@ -3,8 +3,7 @@ const jwt = require('jsonwebtoken');
 module.exports = (req, res, next) => { 
   try {
     const token = req.headers.authorization.split(' ')[1];
-    //const token = req.params;
-    console.log( 'this is the token',token);
+    
     const decodedToken = jwt.verify(token, 'GROUPORAMA_SECRET_TOKEN_P7'); 
    
     const userId = decodedToken.userID;

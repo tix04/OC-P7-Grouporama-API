@@ -75,11 +75,9 @@ exports.getAllPosts = (req, res, next) => {
         }else {
             console.log('All posts Retrieved');
         }
-        //TODO: Posts with no comments do not display
-        //connection.query('SELECT * from posts ORDER BY time_created DESC', (err, rows) => {
-        //connection.query('SELECT posts.post_content, posts.post_image, comments.comment_content FROM posts INNER JOIN comments ON posts.post_id=comments.post_id ORDER BY posts.time_created DESC', (err, rows) => {
+        
         const query1 = 'SELECT posts.post_id, posts.post_content, posts.post_image, posts.comments, posts.likes, posts.likes_array, posts.user_id, users.profile_image , users.username FROM posts INNER JOIN users ON posts.user_id=users.user_id ORDER BY posts.time_created DESC';
-        const query2 = 'SELECT comments.comment_id, comments.comment_content, users.profile_image, users.username, posts.post_id FROM ((comments INNER JOIN users ON comments.user_id=users.user_id) INNER JOIN posts ON comments.post_id=posts.post_id)';
+        const query2 = 'SELECT comments.comment_id, comments.comment_content, users.profile_image, users.username, posts.post_id FROM ((comments LEFT JOIN users ON comments.user_id=users.user_id) LEFT JOIN posts ON comments.post_id=posts.post_id)';
         const query3 = `SELECT profile_image, username FROM users WHERE user_id=${req.userId}`;
 
         const allPostsQuery = query1 + ';' + query2 + ';' + query3;
@@ -105,7 +103,7 @@ exports.getPostsCount = (req, res, next) => {
             console.log('Number of Total Posts retrieved');
         }
 
-        const query1 = 'SELECT COUNT(post_id) AS postsCount FROM posts';
+        const query1 = `SELECT COUNT(post_id) AS postsCount FROM posts WHERE NOT user_id = ${req.userId}`;
         const query2 = `SELECT viewed_posts FROM users WHERE user_id = ${req.userId}`;
 
         const fullQuery = query1 + ';' + query2;
@@ -263,8 +261,8 @@ exports.modifyPost = (req, res, next) => {
 //DELETE Post
 
 exports.deletePost = (req, res, next) => {
+    const userID = req.userId;
     const postID = req.body.postID;
-    console.log(postID);
     
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
@@ -274,7 +272,7 @@ exports.deletePost = (req, res, next) => {
         }
         const query1 = `DELETE from comments WHERE post_id = ${postID}`;
         const query2 = `DELETE from posts WHERE post_id = ${postID}`;
-        const query3 = `UPDATE users SET viewed_posts = viewed_posts - 1`;
+        const query3 = `UPDATE users SET viewed_posts = viewed_posts - 1 WHERE viewed_posts > 0 AND NOT user_id = ${userID}`;
 
         const allPostsQuery = query1 + ';' + query2 + ';' + query3;
 

@@ -25,9 +25,16 @@ exports.logIn = (req, res, next) => {
             "code": 400,
             "message": "error occured"
           });
-        }else {
-          if(results.length > 0) {
-            if(password === results[0].password) {
+        }else if(results.length === 0) {
+          res.status(401).json({
+            message: "Username does not exist"
+          });
+        }else if(results.length > 0) {
+            if(password !== results[0].password) {
+              res.status(401).json({
+                message: "Password is Incorrect."
+              });
+            } else if(password === results[0].password) {
                 console.log(results[0].user_id);
                 const token = jwt.sign(
                     {userID: results[0].user_id},
@@ -39,18 +46,7 @@ exports.logIn = (req, res, next) => {
                     message: "User succesfully logged in",
                     token: token
                 });
-            }else {
-                
-              res.status(401).json({
-                message: "Password does not match"
-              });
             }
-          }else {
-            //res.send("Username does not exist");
-            res.status(401).json({
-              message: "Username does not exist"
-            });
-          }
         }
       });
     });
@@ -105,6 +101,30 @@ exports.verifyEmail = (req, res, next) => {
         }
         console.log(emailList);
         res.send(emailList);
+      }else {
+        console.log(err);
+      }
+    });
+  });
+};
+
+exports.verifyPostsAmount = (req, res, next) => {
+    let userID = req.userId;
+    
+  mySqlConnection.getConnection((err, connection) => {
+    if(err) {
+        throw err;
+    }else {
+        console.log('Your Total Posts Count has been sent!');
+    }
+
+    connection.query('SELECT COUNT(post_id) AS postsCount FROM posts WHERE user_id = ?', [userID], (err, rows) => {
+      
+      connection.release();
+
+      if(!err) {
+        console.log(rows);
+        res.send(rows);
       }else {
         console.log(err);
       }

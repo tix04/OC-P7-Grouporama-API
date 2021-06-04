@@ -51,7 +51,7 @@ exports.checkUpdatedComment = (req, res, next) => {
     console.log('this is the post ID', postID);
 
     
-    const query1 = 'SELECT comments.comment_id, comments.comment_content, users.profile_image, users.username, posts.post_id FROM ((comments INNER JOIN users ON comments.user_id=users.user_id) INNER JOIN posts ON comments.post_id=posts.post_id) WHERE comments.post_id = ? ORDER BY comments.time_created ASC';
+    const query1 = 'SELECT comments.comment_id, comments.comment_content, users.profile_image, users.username, posts.post_id FROM ((comments LEFT JOIN users ON comments.user_id=users.user_id) INNER JOIN posts ON comments.post_id=posts.post_id) WHERE comments.post_id = ? ORDER BY comments.time_created ASC';
 
     mySqlConnection.getConnection((err, connection) => {
         if(err) {

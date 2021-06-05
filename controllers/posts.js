@@ -3,20 +3,19 @@ const fs = require('fs');
 
 //Add a Record in a Post Table
 exports.createPost = (req, res, next) => {
+
     let url, postImage, image_url, newPost;
     let formData = req.body;
     let userId = req.userId;
     let likesArray = '[]';
 
-    console.log(formData);
+    
 
     if(req.file) {
         url = req.protocol + '://' + req.get('host');
         postImage = req.file;
         image_url = url + '/images/' + postImage.filename;
 
-        console.log(postImage);
-        console.log(image_url);
 
         newPost = {
             post_content: formData.postContent,
@@ -27,7 +26,7 @@ exports.createPost = (req, res, next) => {
             likes_array: likesArray
         };
 
-        console.log(newPost);
+        
 
     }else {
         newPost = {
@@ -39,7 +38,7 @@ exports.createPost = (req, res, next) => {
             likes_array: likesArray
         };
 
-        console.log(newPost);
+        
     }
     
     mySqlConnection.getConnection((err, connection) => {
@@ -60,15 +59,16 @@ exports.createPost = (req, res, next) => {
             }else {
                 console.log(err);
             }
-            console.log(req.body);
+            
         });
     });
 };
 
-
+//Render all posts
 exports.getAllPosts = (req, res, next) => {
+
     const data = [{userId: req.userId}];
-    console.log('in posts', data);
+    
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
             throw err;
@@ -83,10 +83,10 @@ exports.getAllPosts = (req, res, next) => {
         const allPostsQuery = query1 + ';' + query2 + ';' + query3;
         connection.query(allPostsQuery , (err, rows) => {
             if(!err) {
-                console.log(rows);
+                
                 rows.push(data);
-                console.log(rows);
                 res.send(rows);
+
             }else {
                 console.log(err);
             }
@@ -96,6 +96,7 @@ exports.getAllPosts = (req, res, next) => {
 
 //Retrieve total amount of posts
 exports.getPostsCount = (req, res, next) => {
+
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
             throw err;
@@ -112,8 +113,8 @@ exports.getPostsCount = (req, res, next) => {
         connection.query(fullQuery, (err,count) => {
             if(!err) {
                 
-                console.log(count);
                 res.send(count);
+
             }else {
                 console.log(err);
             }
@@ -123,7 +124,9 @@ exports.getPostsCount = (req, res, next) => {
 
 //Update if user has seen all posts
 exports.setNotification = (req, res, next) => {
+
     const userID = req.userId;
+
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
             throw err;
@@ -131,11 +134,12 @@ exports.setNotification = (req, res, next) => {
             console.log('Posts viewed have been updated');
         }
 
-        console.log(req.body.count);
+        
         connection.query('UPDATE users SET viewed_posts = ? WHERE user_id = ?', [req.body.count, userID],(err, count) => {
             if(!err) {
 
                 res.send(`You have viewed all new posts`);
+
             }else {
                 console.log(err);
             }
@@ -145,6 +149,7 @@ exports.setNotification = (req, res, next) => {
 
 //Check Likes status
 exports.checkLikes = (req, res, next) => {
+
     const postID = req.params.id;
     
    
@@ -157,7 +162,9 @@ exports.checkLikes = (req, res, next) => {
 
         connection.query('SELECT likes_array FROM posts WHERE post_id = ?', [postID],(err, likesArray) => {
             if(!err) {
+
                 res.send(likesArray);
+
             }else {
                 console.log(err);
             }
@@ -167,17 +174,14 @@ exports.checkLikes = (req, res, next) => {
 
 //Update Likes on post
 exports.setLikes = (req, res, next) => {
+
     const postID = req.body.data.postID;
     const likesArray = req.body.data.likesArray;
 
     const likesTotal = likesArray.length;
 
-    console.log(postID, likesArray, likesTotal);
-
     const stringArray = JSON.stringify(likesArray);
-    console.log(stringArray);
-
-    //res.send('Likes Test Successful');
+    
 
     mySqlConnection.getConnection((err, connection) => {
         if(err) {
@@ -191,6 +195,7 @@ exports.setLikes = (req, res, next) => {
             if(!err) {
 
                 res.send(`Likes have been updated`);
+
             }else {
                 console.log(err);
             }
@@ -201,6 +206,7 @@ exports.setLikes = (req, res, next) => {
 //PUT(Modify)- Edit Text or image posts
 
 exports.modifyPost = (req, res, next) => {
+
     let updatedData = req.body;
     let updatedImage = req.file;
     let url = req.protocol + '://' + req.get('host');
@@ -208,9 +214,9 @@ exports.modifyPost = (req, res, next) => {
 
     const updatedContent = updatedData.postContent;
     const postID = updatedData.postID;
-    console.log(updatedContent, postID);
 
     if(updatedImage === null || updatedImage === undefined) {
+
         mySqlConnection.getConnection((err, connection) => {
             if(err) {
                 throw err;
@@ -223,7 +229,9 @@ exports.modifyPost = (req, res, next) => {
             connection.release();
 
             if(!err) {
+
                 res.send(`Post text has been updated!!`);
+
             }else {
                 console.log(err);
             }
@@ -232,7 +240,9 @@ exports.modifyPost = (req, res, next) => {
             
         });
     }else {
+
         let image_url = url + '/images/' + updatedImage.filename;
+        
         mySqlConnection.getConnection((err, connection) => {
             if(err) {
                 throw err;
@@ -245,7 +255,9 @@ exports.modifyPost = (req, res, next) => {
             connection.release();
 
             if(!err) {
+
                 res.send(`Post text and Image has been updated!!`);
+
             }else {
                 console.log(err);
             }
@@ -261,6 +273,7 @@ exports.modifyPost = (req, res, next) => {
 //DELETE Post
 
 exports.deletePost = (req, res, next) => {
+
     const userID = req.userId;
     const postID = req.body.postID;
     
@@ -281,7 +294,9 @@ exports.deletePost = (req, res, next) => {
             connection.release();
 
             if(!err) {
+
                 res.send(`Post has been deleted!!`);
+                
             }else {
                 console.log(err);
             }

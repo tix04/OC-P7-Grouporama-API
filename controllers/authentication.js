@@ -4,11 +4,11 @@ const fs = require('fs');
 const jwt = require('jsonwebtoken');
 
 //User Log In
-
 exports.logIn = (req, res, next) => {
+
     let username = req.body.username;
     let password = req.body.password;
-    console.log(username, password);
+    
     mySqlConnection.getConnection((err, connection) => {
       if(err) {
           throw err;
@@ -30,12 +30,13 @@ exports.logIn = (req, res, next) => {
             message: "Username does not exist"
           });
         }else if(results.length > 0) {
+
             if(password !== results[0].password) {
               res.status(401).json({
                 message: "Password is Incorrect."
               });
             } else if(password === results[0].password) {
-                console.log(results[0].user_id);
+                
                 const token = jwt.sign(
                     {userID: results[0].user_id},
                     'GROUPORAMA_SECRET_TOKEN_P7',
@@ -52,6 +53,7 @@ exports.logIn = (req, res, next) => {
     });
   };
 
+//Verify if username already exists for User Signup or editing username
 exports.verifyUsername = (req, res, next) => {
 
   mySqlConnection.getConnection((err, connection) => {
@@ -66,13 +68,15 @@ exports.verifyUsername = (req, res, next) => {
       connection.release();
 
       if(!err) {
-        console.log(rows);
+        
         let usernameList = [];
+
         for (let i = 0;i < rows.length;i++) {
           usernameList.push(rows[i].username);
         }
-        console.log(usernameList);
+        
         res.send(usernameList);
+
       }else {
         console.log(err);
       }
@@ -80,6 +84,7 @@ exports.verifyUsername = (req, res, next) => {
   });
 };
 
+//Verify if email already exists for User Signup or editing email
 exports.verifyEmail = (req, res, next) => {
 
   mySqlConnection.getConnection((err, connection) => {
@@ -94,13 +99,15 @@ exports.verifyEmail = (req, res, next) => {
       connection.release();
 
       if(!err) {
-        console.log(rows);
+        
         let emailList = [];
+
         for (let i = 0;i < rows.length;i++) {
           emailList.push(rows[i].email);
         }
-        console.log(emailList);
+        
         res.send(emailList);
+
       }else {
         console.log(err);
       }
@@ -108,7 +115,9 @@ exports.verifyEmail = (req, res, next) => {
   });
 };
 
+//Verify total posts to compare with how many posts user has viewed
 exports.verifyPostsAmount = (req, res, next) => {
+  
     let userID = req.userId;
     
   mySqlConnection.getConnection((err, connection) => {
@@ -123,10 +132,13 @@ exports.verifyPostsAmount = (req, res, next) => {
       connection.release();
 
       if(!err) {
-        console.log(rows);
+        
         res.send(rows);
+
       }else {
+
         console.log(err);
+
       }
     });
   });

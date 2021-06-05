@@ -8,10 +8,11 @@ module.exports = (req, res, next) => {
    
     const userId = decodedToken.userID;
     const profileImage = decodedToken.profileImage;
+    
     if (req.body.userId && req.body.userId !== userId) {
       throw 'Invalid user ID';
     } else {
-      console.log('succeeded auth test');
+      
       req.userId = userId;
       next();
     }

@@ -5,7 +5,7 @@ const auth = require('../middleware/auth');
 
 const authentication = require('../controllers/authentication');
 
-//router.post('/signup', authentication.signUp);
+
 router.get('/verifyUsername', authentication.verifyUsername);
 router.get('/verifyEmail', authentication.verifyEmail);
 router.get('/verifyPostsCount', auth, authentication.verifyPostsAmount)

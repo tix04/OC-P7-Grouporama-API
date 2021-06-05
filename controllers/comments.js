@@ -5,10 +5,10 @@ const fs = require('fs');
 exports.createComment = (req, res, next) => {
     
     let commentData = req.body;
-    console.log(commentData);
 
     let newComment = {
-        user_id: commentData.userID, //Make sure to retrieve this from authentication later
+
+        user_id: commentData.userID,
         post_id: commentData.postID,
         comment_content: commentData.commentContent,
         
@@ -16,7 +16,6 @@ exports.createComment = (req, res, next) => {
 
     let commentsUpdated = commentData.comments;
 
-    console.log(newComment, commentsUpdated);
     const query1 = 'INSERT INTO comments SET ?';
     const query2 = `UPDATE posts SET comments=${commentsUpdated} WHERE post_id=${newComment.post_id}`;
 
@@ -34,7 +33,9 @@ exports.createComment = (req, res, next) => {
             connection.release();
 
             if(!err) {
+
                 res.send('You have created a new comment!!');
+
             }else {
                 console.log(err);
             }
@@ -44,13 +45,11 @@ exports.createComment = (req, res, next) => {
     });
 };
 
-//Check updated Comment
+//Check updated Comment. Ensure Rendered data is actual data(dynamic) instead of manipulating DOM to simulate interactivity.
 exports.checkUpdatedComment = (req, res, next) => {
     
     let postID = req.params.id;
-    console.log('this is the post ID', postID);
 
-    
     const query1 = 'SELECT comments.comment_id, comments.comment_content, users.profile_image, users.username, posts.post_id FROM ((comments LEFT JOIN users ON comments.user_id=users.user_id) INNER JOIN posts ON comments.post_id=posts.post_id) WHERE comments.post_id = ? ORDER BY comments.time_created ASC';
 
     mySqlConnection.getConnection((err, connection) => {
@@ -65,7 +64,9 @@ exports.checkUpdatedComment = (req, res, next) => {
             connection.release();
 
             if(!err) {
+
                 res.send(rows);
+
             }else {
                 console.log(err);
             }
@@ -78,7 +79,6 @@ exports.checkUpdatedComment = (req, res, next) => {
 exports.deleteComment = (req, res, next) => {
 
     let commentData = req.body;
-    console.log(commentData);
 
     const query1 = `DELETE FROM comments WHERE comment_id=${commentData.comment_id}`;
     const query2 = `UPDATE posts SET comments=${commentData.comments} WHERE post_id=${commentData.post_id}`;
@@ -96,7 +96,9 @@ exports.deleteComment = (req, res, next) => {
             connection.release();
 
             if(!err) {
+
                 res.send('You have deleted a comment!!');
+                
             }else {
                 console.log(err);
             }

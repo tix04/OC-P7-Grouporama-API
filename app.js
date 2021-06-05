@@ -1,8 +1,5 @@
 const express = require('express');
-//const busBoy = require('connect-busboy')
 const bodyParser = require('body-parser');
-//const mySql = require('mysql');
-//const fileUpload = require('express-fileupload')
 const path = require('path');
 
 const postRoutes = require('./routes/post');
@@ -22,7 +19,6 @@ app.use((req, res, next) => {
   app.use(bodyParser.json());
   
 
-// This is where all codes go
 app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use('/posts', postRoutes);
 app.use('/comments', commentRoutes);

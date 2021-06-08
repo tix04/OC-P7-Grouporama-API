@@ -1,6 +1,6 @@
 const mySql = require('mysql');
 
-  //Remote Database
+//Remote Database
   const pool = mySql.createPool({ 
     connectionLimit : 50,  //Maximum connection allowed.
     host            : 'remotemysql.com', //Where database is hosted

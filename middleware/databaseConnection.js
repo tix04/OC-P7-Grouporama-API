@@ -1,6 +1,5 @@
 const mySql = require('mysql');
 
-/*
 //Local Database
 const pool = mySql.createPool({ 
     connectionLimit : 50,  //Maximum connection allowed.
@@ -12,8 +11,9 @@ const pool = mySql.createPool({
   });
 
   module.exports = pool;
-  */
+  
 
+  /*
   //Remote Database
   const pool = mySql.createPool({ 
     connectionLimit : 50,  //Maximum connection allowed.
@@ -25,3 +25,4 @@ const pool = mySql.createPool({
   });
 
   module.exports = pool;
+  */

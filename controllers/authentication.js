@@ -1,14 +1,14 @@
 const mySqlConnection = require('../middleware/databaseConnection');
-const fs = require('fs');
+const bcrypt = require('bcrypt');
 
 const jwt = require('jsonwebtoken');
 
 //User Log In
 exports.logIn = (req, res, next) => {
 
-    let username = req.body.username;
     let password = req.body.password;
-    
+    let username = req.body.username;
+
     mySqlConnection.getConnection((err, connection) => {
       if(err) {
           throw err;
@@ -26,28 +26,35 @@ exports.logIn = (req, res, next) => {
             "message": "error occured"
           });
         }else if(results.length === 0) {
+
           res.status(401).json({
             message: "Username does not exist"
           });
-        }else if(results.length > 0) {
 
-            if(password !== results[0].password) {
-              res.status(401).json({
-                message: "Password is Incorrect."
-              });
-            } else if(password === results[0].password) {
-                
-                const token = jwt.sign(
+        }else if(results.length > 0) {
+            //Verify if password is valid
+            bcrypt.compare(password, results[0].password).then(
+              function(valid) {
+
+                if(!valid) {
+                  res.status(401).json({
+                    message: "Password is Incorrect."
+                  });
+
+                }else if(valid) {
+
+                  const token = jwt.sign(
                     {userID: results[0].user_id},
                     'GROUPORAMA_SECRET_TOKEN_P7',
                     { expiresIn: '24h' }
-                );
+                  );
                
-                res.status(200).json({
-                    message: "User succesfully logged in",
-                    token: token
-                });
-            }
+                  res.status(200).json({
+                      message: "User succesfully logged in",
+                      token: token
+                  });
+                }
+            });
         }
       });
     });

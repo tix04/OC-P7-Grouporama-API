@@ -1,82 +1,95 @@
 const mySqlConnection = require('../middleware/databaseConnection');
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 //POST Create User Account
 exports.createUser = (req, res, next) => {
-  let url = req.protocol + '://' + req.get('host');
-  
-  let firstName = req.body.first_name;
-  let lastName = req.body.last_name;
-  let age = req.body.age;
-  let email = req.body.email.toLowerCase();
-  let username = req.body.username.toLowerCase();
-  let password = req.body.password;
 
-  let newUser, image_url, profileImage;
-  
-  if(req.file === null || req.file === undefined ) {
+  //Hash/Crypt Password
+  bcrypt.hash(req.body.password, 10)
+  .then((hash) => 
+    {
+     
+      let url = req.protocol + '://' + req.get('host');
+
+      let firstName = req.body.first_name;
+      let lastName = req.body.last_name;
+      let age = req.body.age;
+      let email = req.body.email.toLowerCase();
+      let username = req.body.username.toLowerCase();
+      let password = hash;
+
+      let newUser, image_url, profileImage;
+
+      if(req.file === null || req.file === undefined ) {
    
-    newUser = {
-      first_name: firstName,
-      last_name: lastName,
-      age: age,
-      email: email,
-      username: username,
-      password: password
-      
-    };
-  }else {
-    profileImage = req.file;
-    image_url =  url + '/images/' + profileImage.filename;
+        newUser = {
+          first_name: firstName,
+          last_name: lastName,
+          age: age,
+          email: email,
+          username: username,
+          password: password
+          
+        };
 
-      newUser = {
-        first_name: firstName,
-        last_name: lastName,
-        age: age,
-        email: email,
-        username: username,
-        password: password,
-        profile_image: image_url
-      };
-    }
-  
-    mySqlConnection.getConnection((err, connection) => {
-      if(err) {
-          throw err;
       }else {
-          console.log('Your Account has been created!!');
-      }
-  
-      const params = newUser;
-      const query1 = 'INSERT INTO users SET ?';
-      const query2 = 'SELECT user_id FROM users where username = ?';
-  
-      const fullQuery = query1 + ';' + query2;
-  
-      connection.query(fullQuery, [params, newUser.username], (err,rows) => { 
-        
-        connection.release();
-        
-        if(!err) {
-          const token = jwt.sign(
-            {userID: rows[0].insertId},
-            'GROUPORAMA_SECRET_TOKEN_P7',
-            { expiresIn: '24h' }
-          );
-  
-          res.status(200).json({
-            message: 'Your Account has been created!!',
-            token: token
-          });
-  
-        }else {
-          console.log(err);
-        }
-        
-        
-          }); 
-      });
+
+        profileImage = req.file;
+        image_url =  url + '/images/' + profileImage.filename;
     
+          newUser = {
+            first_name: firstName,
+            last_name: lastName,
+            age: age,
+            email: email,
+            username: username,
+            password: password,
+            profile_image: image_url
+          };
+        }
+
+        mySqlConnection.getConnection((err, connection) => {
+          if(err) {
+              throw err;
+          }else {
+              console.log('Your Account has been created!!');
+          }
+      
+          const params = newUser;
+          const query1 = 'INSERT INTO users SET ?';
+          const query2 = 'SELECT user_id FROM users where username = ?';
+      
+          const fullQuery = query1 + ';' + query2;
+      
+          connection.query(fullQuery, [params, newUser.username], (err,rows) => { 
+            
+            connection.release();
+            
+            if(!err) {
+
+              const token = jwt.sign(
+                {userID: rows[0].insertId},
+                'GROUPORAMA_SECRET_TOKEN_P7',
+                { expiresIn: '24h' }
+              );
+      
+              res.status(200).json({
+
+                message: 'Your Account has been created!!',
+                token: token
+              });
+      
+            }else {
+
+              console.log(err);
+
+            }
+            
+            
+          }); 
+        });
+    });
 };
 
 //Get one User by id
@@ -164,30 +177,37 @@ exports.modifyUsername = (req, res, next) => {
 //PUT(modify)/Update password for User
 exports.modifyUserPassword = (req, res, next) => {
 
-    const userID = req.userId;
-    const password = req.body.newPassword;
-    
-    mySqlConnection.getConnection((err, connection) => {
-        if(err) {
-          throw err
-        }else{
-          console.log('User password has been updated!');
-        }
-        
+  //Hash/crypt new password
+  bcrypt.hash(req.body.newPassword, 10)
+  .then((hash) => 
+  {
 
-        connection.query('UPDATE users SET password = ? WHERE user_id = ?',[password, userID], (err,rows) => { 
+    const userID = req.userId;
+    const password = hash;
+
+    mySqlConnection.getConnection((err, connection) => {
+      if(err) {
+        throw err;
+      }else{
+        console.log('User password has been updated!');
+      }
       
-            connection.release();
-      
-            if(!err) {
-              res.send(`User Password has been updated!!`);
-            }else {
-              console.log(err);
-            }
-      
-            
-        }); 
+
+      connection.query('UPDATE users SET password = ? WHERE user_id = ?',[password, userID], (err,rows) => { 
+    
+          connection.release();
+    
+          if(!err) {
+            res.send(`User Password has been updated!!`);
+          }else {
+            console.log(err);
+          }
+    
+          
+      }); 
     });
+
+  }); 
 };
 
 //PUT(modify)/Update first_name for User
